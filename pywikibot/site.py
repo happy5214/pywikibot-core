@@ -5699,7 +5699,7 @@ class APISite(BaseSite):
 
     # Flow API calls
     @need_extension('Flow')
-    def load_board(self, page):
+    def load_board(self, page, **kwargs):
         """Retrieve the data for a Flow board.
 
         @param page: A Flow board
@@ -5707,8 +5707,14 @@ class APISite(BaseSite):
         @return: A dict representing the board's data.
         @rtype: dict
         """
+        params = {}
+        for k, v in kwargs.items():
+            params['vtl' + k.replace('_', '-')] = v
+
+        params.setdefault('vtllimit', 100)
         req = self._simple_request(action='flow', page=page,
-                                   submodule='view-topiclist')
+                                   submodule='view-topiclist',
+                                   **params)
         data = req.submit()
         return data['flow']['view-topiclist']['result']['topiclist']
 
@@ -5725,6 +5731,25 @@ class APISite(BaseSite):
                                    submodule='view-topic')
         data = req.submit()
         return data['flow']['view-topic']['result']['topic']
+
+    @need_extension('Flow')
+    def load_post_current_revision(self, page, post_id, format='wikitext'):
+        """Retrieve the data for a post to a Flow topic.
+
+        @param page: A Flow topic
+        @type page: Topic
+        @param post_id: The UUID of the Post
+        @type post_id: unicode
+        @param format: The content format used for the returned content
+        @type format: unicode (either 'wikitext', 'html', or 'fixed-html')
+        @return: A dict representing the post data for the given UUID.
+        @rtype: dict
+        """
+        req = self._simple_request(action='flow', page=page,
+                                   submodule='view-post', vppostId=post_id,
+                                   vpformat=format)
+        data = req.submit()
+        return data['flow']['view-post']['result']['topic']
 
     # aliases for backwards compatibility
     isBlocked = redirect_func(is_blocked, old_name='isBlocked',
