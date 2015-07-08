@@ -165,3 +165,26 @@ class TestFlowLoading(TestCase):
             if i == 10:
                 break
         self.assertEqual(i, 10)
+
+class TestFlowCreateTopic(TestCase):
+
+    """Test the creation of Flow topics."""
+
+    family = 'wikipedia'
+    code = 'test2'
+
+    write = True
+
+    def test_create_topic(self):
+        """Test creation of topic."""
+        site = self.get_site()
+        board = pywikibot.flow.Board(site, 'Talk:Flow QA')
+        topic = board.new_topic('Pywikibot test',
+                                'If you can read this, the Flow code in Pywikibot works!',
+                                'wikitext')
+        first_post = topic.replies()[0]
+        wikitext = first_post.get(format='wikitext')
+        self.assertIn('wikitext', first_post._content)
+        self.assertNotIn('html', first_post._content)
+        self.assertIsInstance(wikitext, unicode)
+        self.assertNotEqual(wikitext, '')
