@@ -104,6 +104,21 @@ class Board(FlowPage):
             cont_args = _parse_url(data['links']['pagination'])
             data = self._load(**cont_args)
 
+    def new_topic(self, title, content, format='wikitext'):
+        """Create and return a Topic object for a new topic on this Board.
+
+        @param title: The title of the new topic
+        @type title: unicode
+        @param content: The content of the topic's initial post
+        @type content: unicode
+        @param format: The content format of the supplied content
+        @type format: unicode (either 'wikitext' or 'html')
+        @return: The new topic
+        @rtype: Topic
+        """
+        data = self.site.create_new_topic(self, title, content, format)
+        return Topic(self.site, data['topic-page'])
+
 
 class Topic(FlowPage):
 

@@ -5815,6 +5815,28 @@ class APISite(BaseSite):
         data = req.submit()
         return data['flow']['view-post']['result']['topic']
 
+    @need_extension('Flow')
+    def create_new_topic(self, page, title, content, format='wikitext'):
+        """Create a new topic on a Flow board.
+        
+        @param page: A Flow board
+        @type page: Board
+        @param title: The title of the new topic
+        @type title: unicode
+        @param content: The content of the topic's initial post
+        @type content: unicode
+        @param format: The content format of the supplied content
+        @type format: unicode (either 'wikitext' or 'html')
+        @return: A dict representing the metadata of the new topic
+        @rtype: dict
+        """
+        token = self.tokens['csrf']
+        req = self._simple_request(action='flow', page=page, token=token,
+                                   submodule='new-topic', nttopic=title,
+                                   ntcontent=content, ntformat=format)
+        data = req.submit()
+        return data['flow']['new-topic']['committed']['topiclist']
+
     # aliases for backwards compatibility
     isBlocked = redirect_func(is_blocked, old_name='isBlocked',
                               class_name='APISite')
